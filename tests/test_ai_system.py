@@ -704,7 +704,7 @@ def test_fuzzy_logic_integration_with_budget():
 def test_fuzzy_logic_uses_user_spiciness_not_dish_spiciness():
     """
     REGRESSION TEST: Ensure fuzzy logic uses user spiciness preference, not dish spiciness.
-    
+
     This test specifically catches the bug where fuzzy_engine was incorrectly called with
     dish.spiciness instead of user spiciness preference, causing wrong base scores.
     """
@@ -721,9 +721,9 @@ def test_fuzzy_logic_uses_user_spiciness_not_dish_spiciness():
         meal_type="main_course",
         attributes=["Mild"],
     )
-    
+
     spicy_dish = Dish(
-        name="Spicy Dish", 
+        name="Spicy Dish",
         price=4.0,
         cuisine="Indian",
         spiciness=9,  # Dish is very spicy
@@ -734,36 +734,36 @@ def test_fuzzy_logic_uses_user_spiciness_not_dish_spiciness():
         meal_type="main_course",
         attributes=["Spicy"],
     )
-    
+
     # User prefers medium spiciness (5) with low budget
     user_prefs = {
-        "budget": 5.0,       # Low budget
-        "cuisine": "Indian", # Matches both dishes
-        "spiciness": 5,      # Medium spiciness preference
+        "budget": 5.0,  # Low budget
+        "cuisine": "Indian",  # Matches both dishes
+        "spiciness": 5,  # Medium spiciness preference
         "is_halal": False,
         "is_vegetarian": False,
     }
-    
+
     # Test each dish individually to isolate fuzzy logic behavior
     engine_mild = RecommendationEngine(dishes=[mild_dish], user_prefs=user_prefs)
     engine_spicy = RecommendationEngine(dishes=[spicy_dish], user_prefs=user_prefs)
-    
+
     rec_mild = engine_mild.get_recommendations()
     rec_spicy = engine_spicy.get_recommendations()
-    
+
     # Both should return recommendations since budget allows and cuisine matches
     assert len(rec_mild) >= 1, "Mild dish should be recommended"
     assert len(rec_spicy) >= 1, "Spicy dish should be recommended"
-    
-    # CRITICAL: Both dishes should have similar base fuzzy scores since the user 
+
+    # CRITICAL: Both dishes should have similar base fuzzy scores since the user
     # preference (budget=5, spiciness=5) is the same for both.
     mild_score = rec_mild[0]["score"]
     spicy_score = rec_spicy[0]["score"]
-    
+
     # Account for cuisine bonus (+1.0), so subtract it to get base fuzzy score
     mild_base = mild_score - 1.0  # Remove cuisine bonus
     spicy_base = spicy_score - 1.0  # Remove cuisine bonus
-    
+
     # The base fuzzy scores should be identical since user preferences are the same
     # Allow small floating point tolerance
     assert abs(mild_base - spicy_base) < 0.01, (
@@ -789,25 +789,25 @@ def test_expert_system_bonuses_apply_with_fuzzy_scores():
         meal_type="main_course",
         attributes=["Popular", "Budget"],
     )
-    
+
     # User preferences that should trigger multiple bonuses
     user_prefs = {
-        "budget": 5.0,         # Low budget (should get good fuzzy score)
-        "cuisine": "Indian",   # Should get +1.0 cuisine bonus
-        "spiciness": 5,        # Medium spiciness (should get fuzzy score) 
-        "is_halal": True,      # Should get +2.0 halal bonus
-        "is_vegetarian": True, # Should get +2.0 vegetarian bonus
+        "budget": 5.0,  # Low budget (should get good fuzzy score)
+        "cuisine": "Indian",  # Should get +1.0 cuisine bonus
+        "spiciness": 5,  # Medium spiciness (should get fuzzy score)
+        "is_halal": True,  # Should get +2.0 halal bonus
+        "is_vegetarian": True,  # Should get +2.0 vegetarian bonus
     }
-    
+
     engine = RecommendationEngine(dishes=[indian_dish], user_prefs=user_prefs)
     recommendations = engine.get_recommendations()
-    
+
     assert len(recommendations) >= 1, "Should get recommendation"
-    
+
     rec = recommendations[0]
     score = rec["score"]
     reasons = rec["reasons"]
-    
+
     # Should have base fuzzy score plus all bonuses
     expected_bonuses = 0
     if "Base compatibility score" in reasons:
@@ -815,15 +815,15 @@ def test_expert_system_bonuses_apply_with_fuzzy_scores():
     if any("cuisine" in r.lower() for r in reasons):
         expected_bonuses += 1  # +1.0 cuisine bonus
     if "Is Halal" in reasons:
-        expected_bonuses += 1  # +2.0 halal bonus  
+        expected_bonuses += 1  # +2.0 halal bonus
     if "Is Vegetarian" in reasons:
         expected_bonuses += 1  # +2.0 vegetarian bonus
-        
+
     # Should have at least 3 types of bonuses (base + 2 expert bonuses minimum)
     assert expected_bonuses >= 3, (
         f"Expected multiple bonuses, got {expected_bonuses}. Reasons: {reasons}"
     )
-    
+
     # Score should be substantial (base fuzzy + expert bonuses)
     assert score > 3.0, (
         f"Expected high score (>3.0) with multiple bonuses, got {score:.2f}"
@@ -837,7 +837,7 @@ def test_specific_bug_scenario_budget5_spiciness5_indian():
     roti_prata = Dish(
         name="Roti Prata",
         price=3.5,
-        cuisine="Indian", 
+        cuisine="Indian",
         spiciness=6,
         is_vegetarian=True,
         is_halal=True,
@@ -846,7 +846,7 @@ def test_specific_bug_scenario_budget5_spiciness5_indian():
         meal_type="main_course",
         attributes=["Popular", "Budget", "Vegetarian"],
     )
-    
+
     # The exact problematic scenario
     user_prefs = {
         "budget": 5,
@@ -855,21 +855,21 @@ def test_specific_bug_scenario_budget5_spiciness5_indian():
         "is_halal": False,
         "is_vegetarian": False,
     }
-    
+
     engine = RecommendationEngine(dishes=[roti_prata], user_prefs=user_prefs)
     recommendations = engine.get_recommendations()
-    
+
     # Should definitely get a recommendation
     assert len(recommendations) >= 1, "Roti Prata should be recommended"
-    
+
     rec = recommendations[0]
     assert rec["dish"]["name"] == "Roti Prata"
-    
+
     # Should have both base fuzzy score and cuisine bonus
     reasons = rec["reasons"]
     assert "Base compatibility score" in reasons, "Should have base fuzzy score"
     assert any("cuisine" in r.lower() for r in reasons), "Should have cuisine bonus"
-    
+
     # Score should be reasonable (base + cuisine bonus)
     score = rec["score"]
     assert score > 1.5, f"Expected score > 1.5, got {score:.2f}"
@@ -884,7 +884,7 @@ def test_fuzzy_score_consistency_across_dishes():
         Dish(
             name="Mild Chinese",
             price=8.0,
-            cuisine="Chinese", 
+            cuisine="Chinese",
             spiciness=1,  # Very mild dish
             is_vegetarian=False,
             is_halal=False,
@@ -900,7 +900,7 @@ def test_fuzzy_score_consistency_across_dishes():
             spiciness=5,  # Medium spicy dish
             is_vegetarian=False,
             is_halal=False,
-            description="Medium spicy Chinese dish", 
+            description="Medium spicy Chinese dish",
             meal_time=["Lunch"],
             meal_type="main_course",
             attributes=["Medium"],
@@ -918,35 +918,35 @@ def test_fuzzy_score_consistency_across_dishes():
             attributes=["Spicy"],
         ),
     ]
-    
+
     # Same user preferences for all tests
     user_prefs = {
         "budget": 10.0,
         "cuisine": "Chinese",  # All dishes match cuisine
-        "spiciness": 6,        # User likes spicy food
+        "spiciness": 6,  # User likes spicy food
         "is_halal": False,
         "is_vegetarian": False,
     }
-    
+
     scores = []
     for dish in dishes:
         engine = RecommendationEngine(dishes=[dish], user_prefs=user_prefs)
         recommendations = engine.get_recommendations()
-        
+
         assert len(recommendations) >= 1, f"Should recommend {dish.name}"
-        
+
         score = recommendations[0]["score"]
         reasons = recommendations[0]["reasons"]
-        
+
         # All should have base compatibility score
         assert "Base compatibility score" in reasons
         # All should have cuisine bonus
         assert any("cuisine" in r.lower() for r in reasons)
-        
+
         # Extract base fuzzy score (total score - cuisine bonus)
         base_score = score - 1.0  # Remove +1.0 cuisine bonus
         scores.append(base_score)
-    
+
     # All base fuzzy scores should be identical (within floating point tolerance)
     for i in range(1, len(scores)):
         assert abs(scores[0] - scores[i]) < 0.01, (
@@ -959,8 +959,8 @@ def test_fuzzy_rule_coverage():
     """Test that all fuzzy rule combinations are covered."""
     test_cases = [
         # (budget, spiciness, expected_minimum_score)
-        (3, 2, 0.5),   # Low budget + mild spice
-        (3, 5, 0.5),   # Low budget + medium spice  
+        (3, 2, 0.5),  # Low budget + mild spice
+        (3, 5, 0.5),  # Low budget + medium spice
         (10, 5, 0.5),  # Medium budget + medium spice
         (25, 8, 0.5),  # Medium budget + spicy
         (25, 2, 0.1),  # Medium budget + mild
@@ -968,11 +968,11 @@ def test_fuzzy_rule_coverage():
         (40, 8, 0.5),  # High budget + spicy
         (40, 2, 0.1),  # High budget + mild (should be lower)
     ]
-    
+
     for budget, spiciness, min_score in test_cases:
         result = fuzzy_engine({"budget": budget, "spiciness": spiciness})
         score = result.get("recommendation_score", 0)
-        
+
         assert score >= min_score, (
             f"Budget={budget}, Spiciness={spiciness} should get score >= {min_score}, "
             f"got {score:.3f}"

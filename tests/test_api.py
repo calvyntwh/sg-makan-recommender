@@ -278,21 +278,24 @@ def test_budget_conscious_student_scenario():
         "is_halal": False,
         "is_vegetarian": False,
     }
-    
+
     response = client.post("/recommend", json=request_data)
     assert response.status_code == 200
-    
+
     recommendations = response.json()
-    assert len(recommendations) >= 1, "Should get recommendations for budget-conscious student"
-    
+    assert len(recommendations) >= 1, (
+        "Should get recommendations for budget-conscious student"
+    )
+
     # All recommendations should be within budget
     for rec in recommendations:
         dish_price = rec["dish"]["price"]
         assert dish_price <= 5.0, f"Dish price {dish_price} exceeds budget of 5.0"
-    
+
     # Should have base compatibility scores (fuzzy logic working)
-    assert any("Base compatibility score" in rec["reasons"] for rec in recommendations), \
-        "Should have fuzzy logic base scores"
+    assert any(
+        "Base compatibility score" in rec["reasons"] for rec in recommendations
+    ), "Should have fuzzy logic base scores"
 
 
 def test_spicy_food_lover_scenario():
@@ -301,20 +304,22 @@ def test_spicy_food_lover_scenario():
     """
     request_data = {
         "budget": 12.0,
-        "cuisine": "any", 
+        "cuisine": "any",
         "spiciness": 8,  # Loves spicy food
         "is_halal": False,
         "is_vegetarian": False,
     }
-    
+
     response = client.post("/recommend", json=request_data)
     assert response.status_code == 200
-    
+
     recommendations = response.json()
     assert len(recommendations) >= 1, "Should get recommendations for spicy food lover"
-    
+
     # Should have base compatibility scores
-    base_scores_present = any("Base compatibility score" in rec["reasons"] for rec in recommendations)
+    base_scores_present = any(
+        "Base compatibility score" in rec["reasons"] for rec in recommendations
+    )
     assert base_scores_present, "Fuzzy logic should provide base compatibility scores"
 
 
@@ -329,22 +334,22 @@ def test_halal_vegetarian_family_scenario():
         "is_halal": True,
         "is_vegetarian": True,
     }
-    
+
     response = client.post("/recommend", json=request_data)
     assert response.status_code == 200
-    
+
     recommendations = response.json()
-    
+
     if recommendations:  # If we have matching dishes
         for rec in recommendations:
             dish = rec["dish"]
             reasons = rec["reasons"]
-            
+
             # If dish is both halal and vegetarian, should have both bonuses
             if dish["is_halal"] and dish["is_vegetarian"]:
                 assert "Is Halal" in reasons, "Should have halal bonus"
                 assert "Is Vegetarian" in reasons, "Should have vegetarian bonus"
-                
+
                 # Score should be high with multiple bonuses
                 assert rec["score"] > 3.0, "Score should be high with multiple bonuses"
 
@@ -354,7 +359,7 @@ def test_specific_cuisine_preference_scenario():
     SCENARIO: User with strong cuisine preference.
     """
     cuisines_to_test = ["Chinese", "Indian", "Malay"]
-    
+
     for cuisine in cuisines_to_test:
         request_data = {
             "budget": 10.0,
@@ -363,20 +368,20 @@ def test_specific_cuisine_preference_scenario():
             "is_halal": False,
             "is_vegetarian": False,
         }
-        
+
         response = client.post("/recommend", json=request_data)
         assert response.status_code == 200
-        
+
         recommendations = response.json()
-        
+
         if recommendations:  # If we have dishes of this cuisine
             for rec in recommendations:
                 dish = rec["dish"]
                 reasons = rec["reasons"]
-                
+
                 # Should match requested cuisine
                 assert dish["cuisine"] == cuisine, f"Expected {cuisine} cuisine"
-                
+
                 # Should have cuisine bonus
                 cuisine_bonus_present = any("cuisine" in r.lower() for r in reasons)
                 assert cuisine_bonus_present, f"Should have cuisine bonus for {cuisine}"
@@ -393,31 +398,33 @@ def test_regression_roti_prata_scenario():
         "is_halal": False,
         "is_vegetarian": False,
     }
-    
+
     response = client.post("/recommend", json=request_data)
     assert response.status_code == 200
-    
+
     recommendations = response.json()
     assert len(recommendations) >= 1, "Should get recommendations"
-    
+
     # Look for Roti Prata specifically
     roti_prata_found = False
     for rec in recommendations:
         if "Roti Prata" in rec["dish"]["name"]:
             roti_prata_found = True
-            
+
             # Should have both base score and cuisine bonus
             reasons = rec["reasons"]
-            assert "Base compatibility score" in reasons, \
+            assert "Base compatibility score" in reasons, (
                 "Roti Prata should have base fuzzy score"
-            assert any("cuisine" in r.lower() for r in reasons), \
+            )
+            assert any("cuisine" in r.lower() for r in reasons), (
                 "Roti Prata should have cuisine bonus"
-            
-            # Score should be reasonable 
+            )
+
+            # Score should be reasonable
             score = rec["score"]
             assert score > 1.5, f"Roti Prata score should be > 1.5, got {score}"
             break
-    
+
     # Roti Prata should appear for this scenario
     assert roti_prata_found, "Roti Prata should be recommended for this scenario"
 
@@ -429,10 +436,10 @@ def test_edge_case_exact_budget_match():
     # Look for dishes that cost exactly $5
     all_dishes_response = client.get("/dishes")
     assert all_dishes_response.status_code == 200
-    
+
     all_dishes = all_dishes_response.json()
     five_dollar_dishes = [dish for dish in all_dishes if dish["price"] == 5.0]
-    
+
     if five_dollar_dishes:  # If we have $5 dishes
         request_data = {
             "budget": 5.0,  # Exact match
@@ -441,15 +448,17 @@ def test_edge_case_exact_budget_match():
             "is_halal": False,
             "is_vegetarian": False,
         }
-        
+
         response = client.post("/recommend", json=request_data)
         assert response.status_code == 200
-        
+
         recommendations = response.json()
-        
+
         # Should include the $5 dishes
         recommended_prices = [rec["dish"]["price"] for rec in recommendations]
-        assert 5.0 in recommended_prices, "Should include dishes that exactly match budget"
+        assert 5.0 in recommended_prices, (
+            "Should include dishes that exactly match budget"
+        )
 
 
 def test_multiple_preference_combinations():
@@ -459,10 +468,10 @@ def test_multiple_preference_combinations():
     budgets = [3.0, 5.0, 10.0, 20.0]
     spiciness_levels = [1, 3, 5, 7, 9]
     cuisines = ["any", "Chinese", "Indian", "Malay"]
-    
+
     successful_requests = 0
     total_requests = 0
-    
+
     for budget in budgets:
         for spiciness in spiciness_levels:
             for cuisine in cuisines:
@@ -473,16 +482,17 @@ def test_multiple_preference_combinations():
                     "is_halal": False,
                     "is_vegetarian": False,
                 }
-                
+
                 response = client.post("/recommend", json=request_data)
                 total_requests += 1
-                
-                assert response.status_code == 200, \
+
+                assert response.status_code == 200, (
                     f"Request failed for budget={budget}, spiciness={spiciness}, cuisine={cuisine}"
-                
+                )
+
                 recommendations = response.json()
                 assert isinstance(recommendations, list), "Should return list"
-                
+
                 # If we get recommendations, they should be valid
                 if recommendations:
                     successful_requests += 1
@@ -490,14 +500,15 @@ def test_multiple_preference_combinations():
                         assert "dish" in rec, "Recommendation should have dish"
                         assert "score" in rec, "Recommendation should have score"
                         assert "reasons" in rec, "Recommendation should have reasons"
-                        
+
                         # Score should be positive
                         assert rec["score"] > 0, "Score should be positive"
-                        
+
                         # Dish price should not exceed budget
-                        assert rec["dish"]["price"] <= budget, \
+                        assert rec["dish"]["price"] <= budget, (
                             f"Dish price {rec['dish']['price']} exceeds budget {budget}"
-    
+                        )
+
     # At least some combinations should return recommendations
     success_rate = successful_requests / total_requests
     assert success_rate > 0.3, f"Success rate too low: {success_rate:.2%}"
@@ -514,25 +525,26 @@ def test_fuzzy_score_consistency_via_api():
         "is_halal": False,
         "is_vegetarian": False,
     }
-    
+
     # Make the same request multiple times
     scores_for_same_dishes = {}
-    
+
     for _ in range(3):  # Test 3 times
         response = client.post("/recommend", json=request_data)
         assert response.status_code == 200
-        
+
         recommendations = response.json()
-        
+
         for rec in recommendations:
             dish_name = rec["dish"]["name"]
             score = rec["score"]
-            
+
             if dish_name in scores_for_same_dishes:
                 # Score should be identical for same dish with same preferences
                 previous_score = scores_for_same_dishes[dish_name]
-                assert abs(score - previous_score) < 0.001, \
+                assert abs(score - previous_score) < 0.001, (
                     f"Score inconsistency for {dish_name}: {score} vs {previous_score}"
+                )
             else:
                 scores_for_same_dishes[dish_name] = score
 
@@ -540,7 +552,7 @@ def test_fuzzy_score_consistency_via_api():
 def test_no_recommendations_scenario():
     """
     SCENARIO: User preferences that result in no matches.
-    
+
     Tests graceful handling when no dishes meet criteria.
     """
     request_data = {
@@ -550,10 +562,10 @@ def test_no_recommendations_scenario():
         "is_halal": False,
         "is_vegetarian": False,
     }
-    
+
     response = client.post("/recommend", json=request_data)
     assert response.status_code == 200
-    
+
     recommendations = response.json()
     assert isinstance(recommendations, list), "Should return empty list, not error"
 
@@ -561,32 +573,36 @@ def test_no_recommendations_scenario():
 def test_high_budget_gourmet_scenario():
     """
     SCENARIO: Wealthy user looking for premium options.
-    
+
     Tests high budget scenarios and premium dish recommendations.
     """
     request_data = {
         "budget": 50.0,  # High budget
         "cuisine": "any",
-        "spiciness": 2,   # Mild preference (often associated with premium dining)
+        "spiciness": 2,  # Mild preference (often associated with premium dining)
         "is_halal": False,
         "is_vegetarian": False,
     }
-    
+
     response = client.post("/recommend", json=request_data)
     assert response.status_code == 200
-    
+
     recommendations = response.json()
-    
+
     if recommendations:
         # Should have base compatibility scores
-        base_scores_present = any("Base compatibility score" in rec["reasons"] for rec in recommendations)
-        assert base_scores_present, "Should have fuzzy logic base scores for high budget scenario"
+        base_scores_present = any(
+            "Base compatibility score" in rec["reasons"] for rec in recommendations
+        )
+        assert base_scores_present, (
+            "Should have fuzzy logic base scores for high budget scenario"
+        )
 
 
 def test_response_structure_validation():
     """
     VALIDATION TEST: Ensure API responses have correct structure.
-    
+
     This catches structural issues in recommendations.
     """
     request_data = {
@@ -596,25 +612,32 @@ def test_response_structure_validation():
         "is_halal": False,
         "is_vegetarian": False,
     }
-    
+
     response = client.post("/recommend", json=request_data)
     assert response.status_code == 200
-    
+
     recommendations = response.json()
     assert isinstance(recommendations, list), "Response should be a list"
-    
+
     for rec in recommendations:
         # Check required fields
         assert "dish" in rec, "Missing dish field"
         assert "score" in rec, "Missing score field"
         assert "reasons" in rec, "Missing reasons field"
-        
+
         # Check dish structure
         dish = rec["dish"]
-        required_dish_fields = ["name", "price", "cuisine", "spiciness", "is_halal", "is_vegetarian"]
+        required_dish_fields = [
+            "name",
+            "price",
+            "cuisine",
+            "spiciness",
+            "is_halal",
+            "is_vegetarian",
+        ]
         for field in required_dish_fields:
             assert field in dish, f"Missing dish field: {field}"
-        
+
         # Check data types
         assert isinstance(rec["score"], (int, float)), "Score should be numeric"
         assert isinstance(rec["reasons"], list), "Reasons should be a list"

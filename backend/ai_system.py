@@ -124,9 +124,7 @@ def simple_fuzzy_inference(inputs):
         budget_high = fuzzy_membership(budget, *config["budget"]["terms"]["high"])
 
         # Calculate membership values for spiciness
-        spice_mild = fuzzy_membership(
-            spiciness, *config["spiciness"]["terms"]["mild"]
-        )
+        spice_mild = fuzzy_membership(spiciness, *config["spiciness"]["terms"]["mild"])
         spice_medium = fuzzy_membership(
             spiciness, *config["spiciness"]["terms"]["medium"]
         )
@@ -150,12 +148,27 @@ def simple_fuzzy_inference(inputs):
         low_score_activation = rule5
 
         # Simple defuzzification with three levels
-        if high_score_activation >= medium_score_activation and high_score_activation >= low_score_activation:
-            score = 7.5 * high_score_activation + 5.0 * medium_score_activation + 2.5 * low_score_activation
+        if (
+            high_score_activation >= medium_score_activation
+            and high_score_activation >= low_score_activation
+        ):
+            score = (
+                7.5 * high_score_activation
+                + 5.0 * medium_score_activation
+                + 2.5 * low_score_activation
+            )
         elif medium_score_activation >= low_score_activation:
-            score = 2.5 * high_score_activation + 5.0 * medium_score_activation + 2.5 * low_score_activation
+            score = (
+                2.5 * high_score_activation
+                + 5.0 * medium_score_activation
+                + 2.5 * low_score_activation
+            )
         else:
-            score = 2.5 * high_score_activation + 2.5 * medium_score_activation + 7.5 * low_score_activation
+            score = (
+                2.5 * high_score_activation
+                + 2.5 * medium_score_activation
+                + 7.5 * low_score_activation
+            )
 
         # Ensure score is in valid range
         score = max(0, min(10, score))
@@ -201,16 +214,13 @@ class RecommendationEngine(KnowledgeEngine):
 
     @Rule(UserPreferences(budget=MATCH.budget, spiciness=MATCH.spiciness))
     def score_dishes(self, budget, spiciness):
-
         # Store recommendations directly instead of using Facts
         self.recommendations = []
 
         for dish in self.dishes:
             # Use fuzzy logic to get the baseline score
             # Compare user budget and user spiciness preference
-            fuzzy_result = fuzzy_engine(
-                {"budget": budget, "spiciness": spiciness}
-            )
+            fuzzy_result = fuzzy_engine({"budget": budget, "spiciness": spiciness})
             fuzzy_score = fuzzy_result.get("recommendation_score", 0.0)
 
             # Apply budget filtering: exclude dishes that exceed user's budget
@@ -229,8 +239,10 @@ class RecommendationEngine(KnowledgeEngine):
             user_prefs = self.user_prefs
 
             # Cuisine matching bonus
-            if user_prefs.get("cuisine", "any").lower() == "any" or \
-               user_prefs.get("cuisine", "").lower() == dish.cuisine.lower():
+            if (
+                user_prefs.get("cuisine", "any").lower() == "any"
+                or user_prefs.get("cuisine", "").lower() == dish.cuisine.lower()
+            ):
                 final_score += 1.0
                 reasons.append(f"Matches cuisine: {dish.cuisine}")
 
@@ -246,11 +258,13 @@ class RecommendationEngine(KnowledgeEngine):
 
             # Only include dishes that have some positive score (fuzzy or expert bonus)
             if final_score > 0:
-                self.recommendations.append({
-                    "dish": dish.model_dump(),
-                    "score": final_score,
-                    "reasons": reasons,
-                })
+                self.recommendations.append(
+                    {
+                        "dish": dish.model_dump(),
+                        "score": final_score,
+                        "reasons": reasons,
+                    }
+                )
 
     @Rule(
         ScoredDish(dish=MATCH.dish, final_score=MATCH.score, reasons=MATCH.reasons),
@@ -326,7 +340,7 @@ class RecommendationEngine(KnowledgeEngine):
         self.run()
 
         # Return the recommendations created by the rule
-        if hasattr(self, 'recommendations') and self.recommendations:
+        if hasattr(self, "recommendations") and self.recommendations:
             sorted_recommendations = sorted(
                 self.recommendations, key=lambda x: x["score"], reverse=True
             )
