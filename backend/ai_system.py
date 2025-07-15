@@ -37,6 +37,10 @@ def create_fuzzy_system():
             consequence=[("recommendation_score", "high")],
         ),
         FuzzyRule(
+            premise=[("budget", "low"), ("spiciness", "medium")],
+            consequence=[("recommendation_score", "medium")],
+        ),
+        FuzzyRule(
             premise=[("budget", "medium"), ("spiciness", "medium")],
             consequence=[("recommendation_score", "high")],
         ),
@@ -47,6 +51,18 @@ def create_fuzzy_system():
         FuzzyRule(
             premise=[("budget", "high"), ("spiciness", "mild")],
             consequence=[("recommendation_score", "low")],
+        ),
+        FuzzyRule(
+            premise=[("budget", "medium"), ("spiciness", "spicy")],
+            consequence=[("recommendation_score", "medium")],
+        ),
+        FuzzyRule(
+            premise=[("budget", "medium"), ("spiciness", "mild")],
+            consequence=[("recommendation_score", "medium")],
+        ),
+        FuzzyRule(
+            premise=[("budget", "low"), ("spiciness", "spicy")],
+            consequence=[("recommendation_score", "medium")],
         ),
     ]
 
@@ -120,19 +136,26 @@ def simple_fuzzy_inference(inputs):
 
         # Apply fuzzy rules using min-max inference
         rule1 = min(budget_low, spice_mild)  # low budget + mild -> high score
-        rule2 = min(budget_medium, spice_medium)  # medium budget + medium -> high score
-        rule3 = min(budget_high, spice_spicy)  # high budget + spicy -> high score
-        rule4 = min(budget_high, spice_mild)  # high budget + mild -> low score
+        rule2 = min(budget_low, spice_medium)  # low budget + medium -> medium score
+        rule3 = min(budget_medium, spice_medium)  # medium budget + medium -> high score
+        rule4 = min(budget_high, spice_spicy)  # high budget + spicy -> high score
+        rule5 = min(budget_high, spice_mild)  # high budget + mild -> low score
+        rule6 = min(budget_medium, spice_spicy)  # medium budget + spicy -> medium score
+        rule7 = min(budget_medium, spice_mild)  # medium budget + mild -> medium score
+        rule8 = min(budget_low, spice_spicy)  # low budget + spicy -> medium score
 
         # Aggregate rules
-        high_score_activation = max(rule1, rule2, rule3)
-        low_score_activation = rule4
+        high_score_activation = max(rule1, rule3, rule4)
+        medium_score_activation = max(rule2, rule6, rule7, rule8)
+        low_score_activation = rule5
 
-        # Simple defuzzification
-        if high_score_activation > low_score_activation:
-            score = 7.5 * high_score_activation + 2.5 * low_score_activation
+        # Simple defuzzification with three levels
+        if high_score_activation >= medium_score_activation and high_score_activation >= low_score_activation:
+            score = 7.5 * high_score_activation + 5.0 * medium_score_activation + 2.5 * low_score_activation
+        elif medium_score_activation >= low_score_activation:
+            score = 2.5 * high_score_activation + 5.0 * medium_score_activation + 2.5 * low_score_activation
         else:
-            score = 2.5 * high_score_activation + 7.5 * low_score_activation
+            score = 2.5 * high_score_activation + 2.5 * medium_score_activation + 7.5 * low_score_activation
 
         # Ensure score is in valid range
         score = max(0, min(10, score))
@@ -184,9 +207,9 @@ class RecommendationEngine(KnowledgeEngine):
 
         for dish in self.dishes:
             # Use fuzzy logic to get the baseline score
-            # Compare user budget against dish price, and use dish spiciness
+            # Compare user budget and user spiciness preference
             fuzzy_result = fuzzy_engine(
-                {"budget": budget, "spiciness": dish.spiciness}
+                {"budget": budget, "spiciness": spiciness}
             )
             fuzzy_score = fuzzy_result.get("recommendation_score", 0.0)
 
