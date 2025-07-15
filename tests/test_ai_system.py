@@ -98,7 +98,7 @@ def test_e1_cuisine_matching():
     }
 
     engine = RecommendationEngine(dishes=[chinese_dish], user_prefs=user_prefs)
-    recommendations = engine.get_recommendations()
+    recommendations, metadata = engine.get_recommendations()
 
     assert isinstance(recommendations, list)
     # Test basic functionality - engine should run without errors
@@ -143,7 +143,7 @@ def test_e2_vegetarian_preference():
     engine = RecommendationEngine(
         dishes=[veg_dish, non_veg_dish], user_prefs=user_prefs
     )
-    recommendations = engine.get_recommendations()
+    recommendations, metadata = engine.get_recommendations()
 
     assert isinstance(recommendations, list)
 
@@ -172,7 +172,7 @@ def test_e3_halal_preference():
     }
 
     engine = RecommendationEngine(dishes=[halal_dish], user_prefs=user_prefs)
-    recommendations = engine.get_recommendations()
+    recommendations, metadata = engine.get_recommendations()
 
     assert isinstance(recommendations, list)
 
@@ -227,7 +227,7 @@ def test_e4_multiple_dishes_ranking():
     }
 
     engine = RecommendationEngine(dishes=dishes, user_prefs=user_prefs)
-    recommendations = engine.get_recommendations()
+    recommendations, metadata = engine.get_recommendations()
 
     assert isinstance(recommendations, list)
     assert len(recommendations) <= 3  # Should return at most 3 recommendations
@@ -257,7 +257,7 @@ def test_e5_multiple_rule_integration():
     }
 
     engine = RecommendationEngine(dishes=[halal_chinese_dish], user_prefs=user_prefs)
-    recommendations = engine.get_recommendations()
+    recommendations, metadata = engine.get_recommendations()
 
     assert isinstance(recommendations, list)
 
@@ -286,7 +286,7 @@ def test_e6_engine_with_no_dishes():
     }
 
     engine = RecommendationEngine(dishes=[], user_prefs=user_prefs)
-    recommendations = engine.get_recommendations()
+    recommendations, metadata = engine.get_recommendations()
 
     assert isinstance(recommendations, list)
     assert len(recommendations) == 0
@@ -335,7 +335,7 @@ def test_budget_filtering_strict():
     engine = RecommendationEngine(
         dishes=[affordable_dish, expensive_dish], user_prefs=low_budget_prefs
     )
-    recommendations = engine.get_recommendations()
+    recommendations, metadata = engine.get_recommendations()
 
     # Should only get affordable dish
     assert len(recommendations) >= 1
@@ -368,7 +368,7 @@ def test_budget_edge_case_exact_match():
     }
 
     engine = RecommendationEngine(dishes=[exact_price_dish], user_prefs=user_prefs)
-    recommendations = engine.get_recommendations()
+    recommendations, metadata = engine.get_recommendations()
 
     # Should include dish that exactly matches budget
     assert len(recommendations) >= 1
@@ -402,7 +402,7 @@ def test_budget_all_dishes_too_expensive():
     }
 
     engine = RecommendationEngine(dishes=expensive_dishes, user_prefs=low_budget_prefs)
-    recommendations = engine.get_recommendations()
+    recommendations, metadata = engine.get_recommendations()
 
     # Should return no recommendations
     assert len(recommendations) == 0
@@ -447,8 +447,8 @@ def test_scoring_vegetarian_bonus():
     engine_veg = RecommendationEngine(dishes=[veg_dish], user_prefs=veg_prefs)
     engine_non_veg = RecommendationEngine(dishes=[veg_dish], user_prefs=non_veg_prefs)
 
-    rec_veg = engine_veg.get_recommendations()
-    rec_non_veg = engine_non_veg.get_recommendations()
+    rec_veg, metadata_veg = engine_veg.get_recommendations()
+    rec_non_veg, metadata_non_veg = engine_non_veg.get_recommendations()
 
     assert len(rec_veg) >= 1
     assert len(rec_non_veg) >= 1
@@ -499,8 +499,8 @@ def test_scoring_halal_bonus():
         dishes=[halal_dish], user_prefs=non_halal_prefs
     )
 
-    rec_halal = engine_halal.get_recommendations()
-    rec_non_halal = engine_non_halal.get_recommendations()
+    rec_halal, metadata_halal = engine_halal.get_recommendations()
+    rec_non_halal, metadata_non_halal = engine_non_halal.get_recommendations()
 
     assert len(rec_halal) >= 1
     assert len(rec_non_halal) >= 1
@@ -551,8 +551,8 @@ def test_scoring_cuisine_bonus():
         dishes=[chinese_dish], user_prefs=any_cuisine_prefs
     )
 
-    rec_chinese = engine_chinese.get_recommendations()
-    rec_any = engine_any.get_recommendations()
+    rec_chinese, metadata_chinese = engine_chinese.get_recommendations()
+    rec_any, metadata_any = engine_any.get_recommendations()
 
     assert len(rec_chinese) >= 1
     assert len(rec_any) >= 1
@@ -618,7 +618,7 @@ def test_comprehensive_scenario_low_budget_vegetarian():
     }
 
     engine = RecommendationEngine(dishes=dishes, user_prefs=user_prefs)
-    recommendations = engine.get_recommendations()
+    recommendations, metadata = engine.get_recommendations()
 
     # Should get recommendations
     assert len(recommendations) >= 1
@@ -681,8 +681,8 @@ def test_fuzzy_logic_integration_with_budget():
         dishes=[medium_dish], user_prefs=high_budget_prefs
     )
 
-    rec_medium = engine_medium.get_recommendations()
-    rec_high = engine_high.get_recommendations()
+    rec_medium, metadata_medium = engine_medium.get_recommendations()
+    rec_high, metadata_high = engine_high.get_recommendations()
 
     # Both should return the dish since it's within budget
     assert len(rec_medium) >= 1
@@ -748,8 +748,8 @@ def test_fuzzy_logic_uses_user_spiciness_not_dish_spiciness():
     engine_mild = RecommendationEngine(dishes=[mild_dish], user_prefs=user_prefs)
     engine_spicy = RecommendationEngine(dishes=[spicy_dish], user_prefs=user_prefs)
 
-    rec_mild = engine_mild.get_recommendations()
-    rec_spicy = engine_spicy.get_recommendations()
+    rec_mild, metadata_mild = engine_mild.get_recommendations()
+    rec_spicy, metadata_spicy = engine_spicy.get_recommendations()
 
     # Both should return recommendations since budget allows and cuisine matches
     assert len(rec_mild) >= 1, "Mild dish should be recommended"
@@ -800,7 +800,7 @@ def test_expert_system_bonuses_apply_with_fuzzy_scores():
     }
 
     engine = RecommendationEngine(dishes=[indian_dish], user_prefs=user_prefs)
-    recommendations = engine.get_recommendations()
+    recommendations, metadata = engine.get_recommendations()
 
     assert len(recommendations) >= 1, "Should get recommendation"
 
@@ -857,7 +857,7 @@ def test_specific_bug_scenario_budget5_spiciness5_indian():
     }
 
     engine = RecommendationEngine(dishes=[roti_prata], user_prefs=user_prefs)
-    recommendations = engine.get_recommendations()
+    recommendations, metadata = engine.get_recommendations()
 
     # Should definitely get a recommendation
     assert len(recommendations) >= 1, "Roti Prata should be recommended"
@@ -931,7 +931,7 @@ def test_fuzzy_score_consistency_across_dishes():
     scores = []
     for dish in dishes:
         engine = RecommendationEngine(dishes=[dish], user_prefs=user_prefs)
-        recommendations = engine.get_recommendations()
+        recommendations, metadata = engine.get_recommendations()
 
         assert len(recommendations) >= 1, f"Should recommend {dish.name}"
 

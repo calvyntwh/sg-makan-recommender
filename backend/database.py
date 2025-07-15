@@ -2,52 +2,60 @@ import os
 
 from sqlmodel import Session, SQLModel, create_engine, select
 
-from backend.models import Dish
+from .config import settings
+from .logging_config import logger
+from .models import Dish
 
 # --- Database Setup ---
-DATABASE_URL = "sqlite:///singapore_food.db"
-DATABASE_FILE = "singapore_food.db"
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(
+    settings.database_url, 
+    connect_args={"check_same_thread": False}
+)
 
 
 def create_db_and_tables():
     """Creates the database and tables if they don't exist."""
-    print("=" * 50)
-    print("Singapore Makan Recommender Starting Up")
-    print("=" * 50)
+    logger.info("=" * 50)
+    logger.info("Singapore Makan Recommender Starting Up")
+    logger.info("=" * 50)
 
-    db_exists = os.path.exists(DATABASE_FILE)
+    db_exists = os.path.exists(settings.database_file)
 
     if db_exists:
-        print(f"Database '{DATABASE_FILE}' already exists. Using existing database.")
+        logger.info("Database '%s' already exists. Using existing database.", settings.database_file)
     else:
-        print(f"Database '{DATABASE_FILE}' not found. Creating new database.")
+        logger.info("Database '%s' not found. Creating new database.", settings.database_file)
 
-    # Create tables if they don't exist (this is safe even if DB exists)
-    SQLModel.metadata.create_all(engine)
+    try:
+        # Create tables if they don't exist (this is safe even if DB exists)
+        SQLModel.metadata.create_all(engine)
+        logger.info("Database tables created/verified successfully")
+    except Exception as e:
+        logger.error("Failed to create database tables: %s", e)
+        raise
 
-    print("Server will be available at:")
-    print("   - Web Interface: http://127.0.0.1:8000/")
-    print("   - API Documentation: http://127.0.0.1:8000/docs")
-    print(
-        "   - API Endpoints: http://127.0.0.1:8000/dishes, http://127.0.0.1:8000/recommend"
-    )
-    print("=" * 50)
+    logger.info("Server will be available at:")
+    logger.info("   - Web Interface: http://%s:%d/", settings.api_host, settings.api_port)
+    logger.info("   - API Documentation: http://%s:%d/docs", settings.api_host, settings.api_port)
+    logger.info("   - API Endpoints: http://%s:%d/dishes, http://%s:%d/recommend", 
+                settings.api_host, settings.api_port, settings.api_host, settings.api_port)
+    logger.info("=" * 50)
 
 
 def seed_database():
     """Populates the database with a hyper-realistic list of Singaporean dishes."""
-    with Session(engine) as session:
-        existing_dish = session.exec(select(Dish)).first()
-        if existing_dish:
-            print("Database already contains dishes. Skipping seed operation.")
-            print("Ready to serve recommendations!")
-            print("=" * 50)
-            return
+    try:
+        with Session(engine) as session:
+            existing_dish = session.exec(select(Dish)).first()
+            if existing_dish:
+                logger.info("Database already contains dishes. Skipping seed operation.")
+                logger.info("Ready to serve recommendations!")
+                logger.info("=" * 50)
+                return
 
-        print("Database is empty. Seeding with Singapore dishes...")
-        dishes = [
-            # === RICE-BASED MAINS ===
+            logger.info("Database is empty. Seeding with Singapore dishes...")
+            dishes = [
+                # === RICE-BASED MAINS ===
             Dish(
                 name="Hainanese Chicken Rice",
                 description="Poached chicken with fragrant oily rice and chilli sauce. A Singapore icon.",
@@ -757,6 +765,10 @@ def seed_database():
         for dish in dishes:
             session.add(dish)
         session.commit()
-        print(f"Successfully seeded database with {len(dishes)} Singapore dishes.")
-        print("Ready to serve recommendations!")
-        print("=" * 50)
+        logger.info("Successfully seeded database with %d Singapore dishes.", len(dishes))
+        logger.info("Ready to serve recommendations!")
+        logger.info("=" * 50)
+        
+    except Exception as e:
+        logger.error("Failed to seed database: %s", e)
+        raise

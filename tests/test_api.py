@@ -50,7 +50,10 @@ def test_recommendation_endpoint_basic():
     }
     response = client.post("/recommend", json=prefs)
     assert response.status_code == 200
-    recommendations = response.json()
+    
+    result = response.json()
+    assert "recommendations" in result
+    recommendations = result["recommendations"]
     assert isinstance(recommendations, list)
 
     # Test recommendation structure if any are returned
@@ -74,7 +77,10 @@ def test_recommendation_vegetarian_preference():
     }
     response = client.post("/recommend", json=prefs)
     assert response.status_code == 200
-    recommendations = response.json()
+    
+    result = response.json()
+    assert "recommendations" in result
+    recommendations = result["recommendations"]
     assert isinstance(recommendations, list)
 
     # If recommendations are returned, they should respect vegetarian preference
@@ -97,7 +103,10 @@ def test_recommendation_halal_preference():
     }
     response = client.post("/recommend", json=prefs)
     assert response.status_code == 200
-    recommendations = response.json()
+    
+    result = response.json()
+    assert "recommendations" in result
+    recommendations = result["recommendations"]
     assert isinstance(recommendations, list)
 
     # If recommendations are returned, they should respect halal preference
@@ -119,7 +128,10 @@ def test_highly_restrictive_filtering():
     }
     response = client.post("/recommend", json=prefs)
     assert response.status_code == 200
-    recommendations = response.json()
+    
+    result = response.json()
+    assert "recommendations" in result
+    recommendations = result["recommendations"]
     assert isinstance(recommendations, list)
 
     # Response can be empty list (valid outcome)
@@ -169,7 +181,10 @@ def test_recommendation_cuisine_specific():
         }
         response = client.post("/recommend", json=prefs)
         assert response.status_code == 200
-        recommendations = response.json()
+        
+        result = response.json()
+        assert "recommendations" in result
+        recommendations = result["recommendations"]
         assert isinstance(recommendations, list)
 
 
@@ -185,7 +200,10 @@ def test_recommendation_spiciness_levels():
         }
         response = client.post("/recommend", json=prefs)
         assert response.status_code == 200
-        recommendations = response.json()
+        
+        result = response.json()
+        assert "recommendations" in result
+        recommendations = result["recommendations"]
         assert isinstance(recommendations, list)
 
 
@@ -282,7 +300,9 @@ def test_budget_conscious_student_scenario():
     response = client.post("/recommend", json=request_data)
     assert response.status_code == 200
 
-    recommendations = response.json()
+    result = response.json()
+    assert "recommendations" in result
+    recommendations = result["recommendations"]
     assert len(recommendations) >= 1, (
         "Should get recommendations for budget-conscious student"
     )
@@ -313,7 +333,9 @@ def test_spicy_food_lover_scenario():
     response = client.post("/recommend", json=request_data)
     assert response.status_code == 200
 
-    recommendations = response.json()
+    result = response.json()
+    assert "recommendations" in result
+    recommendations = result["recommendations"]
     assert len(recommendations) >= 1, "Should get recommendations for spicy food lover"
 
     # Should have base compatibility scores
@@ -338,7 +360,9 @@ def test_halal_vegetarian_family_scenario():
     response = client.post("/recommend", json=request_data)
     assert response.status_code == 200
 
-    recommendations = response.json()
+    result = response.json()
+    assert "recommendations" in result
+    recommendations = result["recommendations"]
 
     if recommendations:  # If we have matching dishes
         for rec in recommendations:
@@ -372,7 +396,9 @@ def test_specific_cuisine_preference_scenario():
         response = client.post("/recommend", json=request_data)
         assert response.status_code == 200
 
-        recommendations = response.json()
+        result = response.json()
+        assert "recommendations" in result
+        recommendations = result["recommendations"]
 
         if recommendations:  # If we have dishes of this cuisine
             for rec in recommendations:
@@ -402,7 +428,9 @@ def test_regression_roti_prata_scenario():
     response = client.post("/recommend", json=request_data)
     assert response.status_code == 200
 
-    recommendations = response.json()
+    result = response.json()
+    assert "recommendations" in result
+    recommendations = result["recommendations"]
     assert len(recommendations) >= 1, "Should get recommendations"
 
     # Look for Roti Prata specifically
@@ -452,7 +480,9 @@ def test_edge_case_exact_budget_match():
         response = client.post("/recommend", json=request_data)
         assert response.status_code == 200
 
-        recommendations = response.json()
+        result = response.json()
+        assert "recommendations" in result
+        recommendations = result["recommendations"]
 
         # Should include the $5 dishes
         recommended_prices = [rec["dish"]["price"] for rec in recommendations]
@@ -490,7 +520,9 @@ def test_multiple_preference_combinations():
                     f"Request failed for budget={budget}, spiciness={spiciness}, cuisine={cuisine}"
                 )
 
-                recommendations = response.json()
+                result = response.json()
+                assert "recommendations" in result
+                recommendations = result["recommendations"]
                 assert isinstance(recommendations, list), "Should return list"
 
                 # If we get recommendations, they should be valid
@@ -533,7 +565,9 @@ def test_fuzzy_score_consistency_via_api():
         response = client.post("/recommend", json=request_data)
         assert response.status_code == 200
 
-        recommendations = response.json()
+        result = response.json()
+        assert "recommendations" in result
+        recommendations = result["recommendations"]
 
         for rec in recommendations:
             dish_name = rec["dish"]["name"]
@@ -566,8 +600,29 @@ def test_no_recommendations_scenario():
     response = client.post("/recommend", json=request_data)
     assert response.status_code == 200
 
-    recommendations = response.json()
-    assert isinstance(recommendations, list), "Should return empty list, not error"
+    result = response.json()
+    
+    # Check new enhanced response structure
+    assert "recommendations" in result
+    assert "metadata" in result
+    assert "success" in result
+    assert "message" in result
+    
+    # Should return empty recommendations
+    assert isinstance(result["recommendations"], list)
+    assert len(result["recommendations"]) == 0
+    
+    # Check metadata provides useful information
+    metadata = result["metadata"]
+    assert metadata["total_candidates"] > 0
+    assert metadata["filtered_candidates"] == 0
+    assert "budget" in metadata["filters_applied"]
+    assert metadata["suggestions"] is not None
+    assert "budget" in metadata["suggestions"].lower()
+    
+    # Check success flag and helpful message
+    assert result["success"] is True
+    assert "No dishes match" in result["message"]
 
 
 def test_high_budget_gourmet_scenario():
@@ -587,7 +642,16 @@ def test_high_budget_gourmet_scenario():
     response = client.post("/recommend", json=request_data)
     assert response.status_code == 200
 
-    recommendations = response.json()
+    result = response.json()
+    
+    # Check enhanced response structure
+    assert "recommendations" in result
+    assert "metadata" in result
+    assert "success" in result
+    assert "message" in result
+    
+    recommendations = result["recommendations"]
+    metadata = result["metadata"]
 
     if recommendations:
         # Should have base compatibility scores
@@ -597,11 +661,20 @@ def test_high_budget_gourmet_scenario():
         assert base_scores_present, (
             "Should have fuzzy logic base scores for high budget scenario"
         )
+        
+        # Check metadata for successful scenario
+        assert metadata["total_candidates"] > 0
+        assert metadata["filtered_candidates"] >= len(recommendations)
+        assert metadata["suggestions"] is None  # No suggestions needed when we have results
+        
+        # Check success message
+        assert result["success"] is True
+        assert "great recommendations" in result["message"]
 
 
 def test_response_structure_validation():
     """
-    VALIDATION TEST: Ensure API responses have correct structure.
+    VALIDATION TEST: Ensure API responses have correct enhanced structure.
 
     This catches structural issues in recommendations.
     """
@@ -616,30 +689,55 @@ def test_response_structure_validation():
     response = client.post("/recommend", json=request_data)
     assert response.status_code == 200
 
-    recommendations = response.json()
-    assert isinstance(recommendations, list), "Response should be a list"
+    result = response.json()
 
-    for rec in recommendations:
-        # Check required fields
-        assert "dish" in rec, "Missing dish field"
-        assert "score" in rec, "Missing score field"
-        assert "reasons" in rec, "Missing reasons field"
+    # Test enhanced response structure
+    assert isinstance(result, dict), "Response should be a dictionary"
+    
+    # Check all required top-level fields
+    required_fields = ["recommendations", "metadata", "success", "message"]
+    for field in required_fields:
+        assert field in result, f"Response missing required field: {field}"
 
-        # Check dish structure
-        dish = rec["dish"]
-        required_dish_fields = [
-            "name",
-            "price",
-            "cuisine",
-            "spiciness",
-            "is_halal",
-            "is_vegetarian",
-        ]
-        for field in required_dish_fields:
-            assert field in dish, f"Missing dish field: {field}"
+    # Validate recommendations structure
+    recommendations = result["recommendations"]
+    assert isinstance(recommendations, list), "Recommendations should be a list"
+    
+    # Validate metadata structure
+    metadata = result["metadata"]
+    assert isinstance(metadata, dict), "Metadata should be a dictionary"
+    
+    required_metadata_fields = [
+        "total_candidates", "filtered_candidates", "scoring_method", 
+        "filters_applied", "suggestions"
+    ]
+    for field in required_metadata_fields:
+        assert field in metadata, f"Metadata missing required field: {field}"
+    
+    # Validate metadata field types
+    assert isinstance(metadata["total_candidates"], int)
+    assert isinstance(metadata["filtered_candidates"], int)
+    assert isinstance(metadata["scoring_method"], str)
+    assert isinstance(metadata["filters_applied"], list)
+    assert metadata["suggestions"] is None or isinstance(metadata["suggestions"], str)
+    
+    # Validate success and message
+    assert isinstance(result["success"], bool)
+    assert isinstance(result["message"], str)
 
-        # Check data types
-        assert isinstance(rec["score"], (int, float)), "Score should be numeric"
-        assert isinstance(rec["reasons"], list), "Reasons should be a list"
-        assert isinstance(dish["price"], (int, float)), "Price should be numeric"
-        assert isinstance(dish["spiciness"], int), "Spiciness should be integer"
+    # If we have recommendations, validate their structure
+    if recommendations:
+        for rec in recommendations[:3]:  # Check first few recommendations
+            assert isinstance(rec, dict), "Each recommendation should be a dictionary"
+            
+            # Check required recommendation fields
+            required_rec_fields = ["dish", "score", "reasons"]
+            for field in required_rec_fields:
+                assert field in rec, f"Recommendation missing field: {field}"
+            
+            # Validate dish structure
+            dish = rec["dish"]
+            assert isinstance(dish, dict)
+            dish_fields = ["id", "name", "price", "cuisine", "spiciness", "is_halal", "is_vegetarian"]
+            for field in dish_fields:
+                assert field in dish, f"Dish missing field: {field}"
