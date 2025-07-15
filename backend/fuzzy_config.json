@@ -1,0 +1,26 @@
+{
+  "budget": {
+    "universe_range": [0, 50],
+    "terms": {
+      "low": [0, 15, 20],
+      "medium": [15, 25, 35],
+      "high": [30, 50, 50]
+    }
+  },
+  "spiciness": {
+    "universe_range": [0, 10],
+    "terms": {
+      "mild": [0, 0, 4],
+      "medium": [3, 5, 7],
+      "spicy": [6, 10, 10]
+    }
+  },
+  "recommendation_score": {
+    "universe_range": [0, 10],
+    "terms": {
+      "low": [0, 0, 5],
+      "medium": [3, 5, 7],
+      "high": [5, 10, 10]
+    }
+  }
+}

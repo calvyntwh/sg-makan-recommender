@@ -1,0 +1,2 @@
+# Placeholder file for test-related content.
+# This file ensures the 'tests' directory is included in version control.
