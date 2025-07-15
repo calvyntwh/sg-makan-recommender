@@ -43,7 +43,7 @@ def get_recommendations(prefs: UserPreferences):
     with Session(engine) as session:
         dishes = session.exec(select(Dish)).all()
         engine_instance = RecommendationEngine(
-            dishes=dishes, user_prefs=prefs.model_dump()
+            dishes=list(dishes), user_prefs=prefs.model_dump()
         )
         recommendations = engine_instance.get_recommendations()
         return recommendations
