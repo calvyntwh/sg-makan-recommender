@@ -8,7 +8,6 @@ dependencies = [
     "sqlmodel",
     "experta",
     "fuzzy_expert",
-    "httpx",
 ]
 
 [project.optional-dependencies]
