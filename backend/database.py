@@ -29,7 +29,9 @@ def create_db_and_tables():
     print("Server will be available at:")
     print("   - Web Interface: http://127.0.0.1:8000/")
     print("   - API Documentation: http://127.0.0.1:8000/docs")
-    print("   - API Endpoints: http://127.0.0.1:8000/dishes, http://127.0.0.1:8000/recommend")
+    print(
+        "   - API Endpoints: http://127.0.0.1:8000/dishes, http://127.0.0.1:8000/recommend"
+    )
     print("=" * 50)
 
 
@@ -48,7 +50,7 @@ def seed_database():
             # === RICE-BASED MAINS ===
             Dish(
                 name="Hainanese Chicken Rice",
-                description="Poached chicken with fragrant oily rice and chilli sauce.",
+                description="Poached chicken with fragrant oily rice and chilli sauce. A Singapore icon.",
                 price=5.50,
                 cuisine="Chinese",
                 spiciness=1,
@@ -60,10 +62,7 @@ def seed_database():
             ),
             Dish(
                 name="Nasi Lemak",
-                description=(
-                    "Coconut rice with sambal chili, fried chicken wing, egg, and "
-                    "ikan bilis."
-                ),
+                description="Coconut rice with sambal chili, fried chicken wing, egg, and ikan bilis. Typically Halal.",
                 price=6.50,
                 cuisine="Malay",
                 spiciness=7,
@@ -75,7 +74,7 @@ def seed_database():
             ),
             Dish(
                 name="Duck Rice",
-                description="Braised duck served with either plain rice or yam rice.",
+                description="Braised duck served with either plain rice or yam rice. Typically served at non-Halal stalls.",
                 price=6.00,
                 cuisine="Chinese",
                 spiciness=0,
@@ -87,21 +86,19 @@ def seed_database():
             ),
             Dish(
                 name="Nasi Padang",
-                description="Steamed rice served with a variety of pre-cooked dishes.",
+                description="Steamed rice served with a variety of pre-cooked dishes. Typically Halal.",
                 price=15.00,
                 cuisine="Malay",
                 spiciness=8,
                 meal_time=["Lunch", "Dinner"],
                 meal_type="main_course",
-                attributes=["Rice", "Spicy", "Variety"],
+                attributes=["Rice", "Spicy", "Variety", "Splurge"],
                 is_halal=True,
                 is_vegetarian=False,
             ),
             Dish(
                 name="Vegetarian Briyani",
-                description=(
-                    "Aromatic basmati rice cooked with mixed vegetables and spices."
-                ),
+                description="Aromatic basmati rice cooked with mixed vegetables and spices. Halal and vegetarian.",
                 price=7.50,
                 cuisine="Indian",
                 spiciness=5,
@@ -113,10 +110,7 @@ def seed_database():
             ),
             Dish(
                 name="Economy Rice (Cai Fan)",
-                description=(
-                    "Plain rice with a selection of several cooked dishes. Price "
-                    "varies."
-                ),
+                description="Plain rice with a selection of cooked dishes. Price varies. Typically not Halal.",
                 price=4.50,
                 cuisine="Chinese",
                 spiciness=3,
@@ -126,28 +120,58 @@ def seed_database():
                 is_halal=False,
                 is_vegetarian=False,
             ),
+            Dish(
+                name="Claypot Rice",
+                description="Rice cooked in a claypot with chicken and Chinese sausage, creating a crispy bottom layer. Not Halal.",
+                price=12.00,
+                cuisine="Chinese",
+                spiciness=2,
+                meal_time=["Dinner"],
+                meal_type="main_course",
+                attributes=["Rice", "Comfort", "Zi Char"],
+                is_halal=False,
+                is_vegetarian=False,
+            ),
+            Dish(
+                name="Thunder Tea Rice (Lei Cha)",
+                description="A healthy Hakka dish with rice and various vegetables, served with a tea-based soup. Often vegetarian.",
+                price=8.00,
+                cuisine="Chinese",
+                spiciness=1,
+                meal_time=["Lunch", "Dinner"],
+                meal_type="main_course",
+                attributes=["Rice", "Healthy", "Vegetarian"],
+                is_halal=True,  # Often sold in vegetarian stalls which are Halal
+                is_vegetarian=True,
+            ),
+            Dish(
+                name="Ayam Penyet",
+                description="Indonesian smashed fried chicken, served with rice, potent sambal, and fried tofu. Halal.",
+                price=7.50,
+                cuisine="Malay",
+                spiciness=8,
+                meal_time=["Lunch", "Dinner"],
+                meal_type="main_course",
+                attributes=["Rice", "Spicy", "Fried"],
+                is_halal=True,
+                is_vegetarian=False,
+            ),
             # === NOODLE-BASED MAINS ===
             Dish(
                 name="Laksa",
-                description=(
-                    "Spicy noodle soup with coconut milk, shrimp, cockles, and "
-                    "fishcake."
-                ),
+                description="Spicy noodle soup with coconut milk, shrimp, and cockles. Halal versions exist but are less common.",
                 price=6.00,
                 cuisine="Local",
                 spiciness=8,
                 meal_time=["Lunch"],
                 meal_type="main_course",
                 attributes=["Soupy", "Spicy", "Noodles", "Popular", "Seafood"],
-                is_halal=True,
+                is_halal=False,  # Default version contains non-halal elements
                 is_vegetarian=False,
             ),
             Dish(
                 name="Char Kway Teow",
-                description=(
-                    "Stir-fried flat rice noodles with dark soy sauce, shrimp, and "
-                    "Chinese sausage."
-                ),
+                description="Stir-fried flat rice noodles with dark soy sauce, shrimp, and Chinese sausage. Contains lard, not Halal.",
                 price=7.00,
                 cuisine="Chinese",
                 spiciness=3,
@@ -159,10 +183,7 @@ def seed_database():
             ),
             Dish(
                 name="Hokkien Mee",
-                description=(
-                    "Stir-fried yellow noodles and rice vermicelli with shrimp, "
-                    "squid, and a rich prawn broth."
-                ),
+                description="Stir-fried noodles in rich prawn broth, with shrimp and squid. Often cooked with non-Halal pork lard.",
                 price=8.00,
                 cuisine="Chinese",
                 spiciness=3,
@@ -174,10 +195,7 @@ def seed_database():
             ),
             Dish(
                 name="Bak Chor Mee",
-                description=(
-                    "Minced meat noodles, often with mushrooms, pork balls, and a "
-                    "vinegar-based sauce."
-                ),
+                description="Minced pork noodles with mushrooms, pork balls, and a signature vinegar-based sauce. Not Halal.",
                 price=5.00,
                 cuisine="Chinese",
                 spiciness=4,
@@ -189,9 +207,7 @@ def seed_database():
             ),
             Dish(
                 name="Wonton Mee",
-                description=(
-                    "Egg noodles with barbecued pork (char siu) and wonton dumplings."
-                ),
+                description="Egg noodles with barbecued pork (char siu) and wonton dumplings. Not Halal.",
                 price=5.00,
                 cuisine="Chinese",
                 spiciness=2,
@@ -203,9 +219,7 @@ def seed_database():
             ),
             Dish(
                 name="Mee Rebus",
-                description=(
-                    "Yellow egg noodles in a thick, spicy, sweet potato-based gravy."
-                ),
+                description="Yellow egg noodles in a thick, spicy, sweet potato-based gravy. A Halal Malay dish.",
                 price=4.50,
                 cuisine="Malay",
                 spiciness=5,
@@ -217,10 +231,7 @@ def seed_database():
             ),
             Dish(
                 name="Mee Soto",
-                description=(
-                    "Spicy chicken noodle soup, often with shredded chicken and a "
-                    "clear broth."
-                ),
+                description="Spicy chicken noodle soup with shredded chicken and a clear, fragrant broth. Halal.",
                 price=5.00,
                 cuisine="Malay",
                 spiciness=6,
@@ -232,7 +243,7 @@ def seed_database():
             ),
             Dish(
                 name="Sliced Fish Bee Hoon",
-                description="Rice vermicelli soup with slices of fresh fish.",
+                description="Rice vermicelli soup with slices of fresh fish. Typically from non-Halal Chinese stalls.",
                 price=6.50,
                 cuisine="Chinese",
                 spiciness=0,
@@ -244,7 +255,7 @@ def seed_database():
             ),
             Dish(
                 name="Vegetarian Bee Hoon",
-                description="Stir-fried rice vermicelli with vegetables.",
+                description="Stir-fried rice vermicelli with assorted mock meats and vegetables. Halal and vegetarian.",
                 price=4.50,
                 cuisine="Chinese",
                 spiciness=0,
@@ -256,8 +267,8 @@ def seed_database():
             ),
             Dish(
                 name="Creamy Carbonara",
-                description="Pasta with a creamy egg-based sauce, bacon, and cheese.",
-                price=18.00,
+                description="Pasta with a creamy egg-based sauce, bacon, and cheese. Cafe-style dish, not typical hawker fare.",
+                price=16.00,  # Adjusted price
                 cuisine="Western",
                 spiciness=0,
                 meal_time=["Lunch", "Dinner"],
@@ -266,13 +277,46 @@ def seed_database():
                 is_halal=False,
                 is_vegetarian=False,
             ),
+            Dish(
+                name="Kway Chap",
+                description="Broad rice sheets in a dark soy broth, served with pig offal. A non-Halal specialty.",
+                price=6.00,
+                cuisine="Chinese",
+                spiciness=1,
+                meal_time=["Lunch", "Dinner"],
+                meal_type="main_course",
+                attributes=["Noodles", "Soupy"],
+                is_halal=False,
+                is_vegetarian=False,
+            ),
+            Dish(
+                name="Mee Siam",
+                description="Rice vermicelli in a sweet, sour, and spicy gravy. A Halal dish from Malay vendors.",
+                price=4.00,
+                cuisine="Malay",
+                spiciness=5,
+                meal_time=["Breakfast", "Lunch"],
+                meal_type="main_course",
+                attributes=["Noodles", "Spicy", "Soupy"],
+                is_halal=True,
+                is_vegetarian=False,
+            ),
+            Dish(
+                name="Ban Mian",
+                description="Hand-made flat noodle soup with minced pork and egg. Typically not Halal.",
+                price=5.50,
+                cuisine="Chinese",
+                spiciness=2,
+                meal_time=["Lunch", "Dinner"],
+                meal_type="main_course",
+                attributes=["Noodles", "Soupy", "Comfort"],
+                is_halal=False,
+                is_vegetarian=False,
+            ),
             # === FAMOUS MAINS & ZI CHAR ===
             Dish(
                 name="Chilli Crab",
-                description=(
-                    "Mud crabs stir-fried in a sweet, savoury, and spicy "
-                    "tomato-based sauce. A national dish."
-                ),
+                description="Mud crabs in a sweet, savoury, and spicy tomato-based sauce. A non-Halal national dish.",
                 price=45.00,
                 cuisine="Local",
                 spiciness=7,
@@ -284,9 +328,9 @@ def seed_database():
             ),
             Dish(
                 name="Fish Head Curry",
-                description="A large fish head and vegetables cooked in a rich curry.",
+                description="A large fish head and vegetables in a rich curry. Indian style is often Halal, Chinese style is not.",
                 price=25.00,
-                cuisine="Indian",
+                cuisine="Indian",  # Assuming Indian style for Halal
                 spiciness=8,
                 meal_time=["Lunch", "Dinner"],
                 meal_type="main_course",
@@ -296,7 +340,7 @@ def seed_database():
             ),
             Dish(
                 name="Bak Kut Teh",
-                description="Porky rib soup boiled with herbs and spices.",
+                description="Pork rib soup boiled with herbs and spices. A non-Halal dish.",
                 price=12.00,
                 cuisine="Chinese",
                 spiciness=2,
@@ -308,7 +352,7 @@ def seed_database():
             ),
             Dish(
                 name="Cereal Prawn",
-                description="Deep-fried prawns coated in a buttery cereal mix.",
+                description="Deep-fried prawns coated in a buttery cereal mix. A Zi Char favourite, typically not Halal.",
                 price=22.00,
                 cuisine="Chinese",
                 spiciness=1,
@@ -320,19 +364,19 @@ def seed_database():
             ),
             Dish(
                 name="Sambal Kangkong",
-                description="Water spinach stir-fried with spicy sambal sauce.",
+                description="Water spinach stir-fried with spicy sambal sauce. Often contains shrimp paste (belacan).",
                 price=10.00,
-                cuisine="Chinese",
+                cuisine="Local",
                 spiciness=8,
                 meal_time=["Dinner"],
                 meal_type="side_dish",
                 attributes=["Vegetable", "Spicy", "Zi Char"],
-                is_halal=True,
-                is_vegetarian=True,
+                is_halal=True,  # Can be found in Halal Zi Char
+                is_vegetarian=False,  # Not vegetarian due to belacan
             ),
             Dish(
                 name="Hotplate Tofu",
-                description="Sizzling plate of egg tofu with minced meat and sauce.",
+                description="Sizzling plate of egg tofu with minced meat and sauce. From non-Halal Zi Char stalls.",
                 price=14.00,
                 cuisine="Chinese",
                 spiciness=2,
@@ -344,10 +388,7 @@ def seed_database():
             ),
             Dish(
                 name="Salted Egg Pork Ribs",
-                description=(
-                    "Fried pork ribs coated in a creamy and savoury salted egg yolk "
-                    "sauce."
-                ),
+                description="Fried pork ribs coated in a savoury salted egg yolk sauce. A non-Halal Zi Char dish.",
                 price=18.00,
                 cuisine="Chinese",
                 spiciness=1,
@@ -357,40 +398,70 @@ def seed_database():
                 is_halal=False,
                 is_vegetarian=False,
             ),
+            Dish(
+                name="Black Pepper Crab",
+                description="Hard-shell crabs fried with a potent black pepper sauce. Typically not Halal.",
+                price=45.00,
+                cuisine="Local",
+                spiciness=6,
+                meal_time=["Dinner"],
+                meal_type="main_course",
+                attributes=["Seafood", "Spicy", "Popular", "Splurge"],
+                is_halal=False,
+                is_vegetarian=False,
+            ),
+            Dish(
+                name="Fish and Chips",
+                description="Battered fried fish with french fries. Often Halal in food courts, but check for beer batter.",
+                price=15.00,
+                cuisine="Western",
+                spiciness=0,
+                meal_time=["Lunch", "Dinner"],
+                meal_type="main_course",
+                attributes=["Fried", "Comfort", "Seafood"],
+                is_halal=True,
+                is_vegetarian=False,
+            ),
+            Dish(
+                name="Sup Tulang Merah (Mutton Bone Soup)",
+                description="Mutton bones in a vibrant, spicy red soup, eaten with bread. An Indian Muslim specialty.",
+                price=10.00,
+                cuisine="Indian",
+                spiciness=5,
+                meal_time=["Dinner"],
+                meal_type="main_course",
+                attributes=["Soupy", "Spicy", "Messy"],
+                is_halal=True,
+                is_vegetarian=False,
+            ),
             # === BREADS, SNACKS & SIDES ===
             Dish(
                 name="Roti Prata",
-                description="South-Indian flatbread, served with fish or mutton curry.",
+                description="South-Indian flatbread, served with curry. A Halal favourite.",
                 price=3.50,
                 cuisine="Indian",
                 spiciness=6,
                 meal_time=["Breakfast", "Supper"],
                 meal_type="main_course",
-                attributes=["Popular", "Budget"],
+                attributes=["Popular", "Budget", "Vegetarian"],
                 is_halal=True,
                 is_vegetarian=True,
             ),
             Dish(
                 name="Kaya Toast Set",
-                description=(
-                    "Toasted bread with coconut jam (kaya) and butter, served with "
-                    "soft-boiled eggs and coffee."
-                ),
+                description="Toasted bread with coconut jam (kaya) and butter, with soft-boiled eggs. Check vendor for Halal status.",
                 price=5.00,
                 cuisine="Local",
                 spiciness=0,
                 meal_time=["Breakfast"],
                 meal_type="main_course",
-                attributes=["Popular", "Budget"],
-                is_halal=True,
+                attributes=["Popular", "Budget", "Vegetarian"],
+                is_halal=True,  # Mostly, but not guaranteed
                 is_vegetarian=True,
             ),
             Dish(
                 name="Murtabak",
-                description=(
-                    "Pan-fried bread stuffed with minced meat (mutton or chicken), "
-                    "egg, and onion."
-                ),
+                description="Pan-fried bread stuffed with minced meat (mutton/chicken), egg, and onion. Halal.",
                 price=9.00,
                 cuisine="Indian",
                 spiciness=4,
@@ -402,10 +473,7 @@ def seed_database():
             ),
             Dish(
                 name="Thosai (Dosa)",
-                description=(
-                    "A thin pancake made from fermented rice batter, served with "
-                    "chutneys and sambar."
-                ),
+                description="A thin pancake from fermented rice batter, with chutneys and sambar. Halal and vegetarian.",
                 price=4.00,
                 cuisine="Indian",
                 spiciness=4,
@@ -417,12 +485,9 @@ def seed_database():
             ),
             Dish(
                 name="Satay",
-                description=(
-                    "Grilled meat skewers served with peanut sauce, onions, and "
-                    "cucumber."
-                ),
+                description="Grilled meat skewers with peanut sauce. Halal from Malay stalls, not from Chinese stalls.",
                 price=10.00,
-                cuisine="Malay",
+                cuisine="Malay",  # Assuming Malay style for Halal
                 spiciness=1,
                 meal_time=["Dinner", "Supper"],
                 meal_type="side_dish",
@@ -432,10 +497,7 @@ def seed_database():
             ),
             Dish(
                 name="Carrot Cake (Chai Tow Kway)",
-                description=(
-                    "Stir-fried radish cake cubes with eggs. Available in 'white' or "
-                    "'black'."
-                ),
+                description="Stir-fried radish cake with eggs and preserved radish. Not vegetarian by default (can contain lard/shrimp).",
                 price=4.00,
                 cuisine="Chinese",
                 spiciness=1,
@@ -443,13 +505,11 @@ def seed_database():
                 meal_type="main_course",
                 attributes=["Popular"],
                 is_halal=False,
-                is_vegetarian=True,
+                is_vegetarian=False,
             ),
             Dish(
                 name="Oyster Omelette (Orh Luak)",
-                description=(
-                    "Starch-based omelette with fresh oysters, fried until crispy."
-                ),
+                description="Starch-based omelette with fresh oysters, fried until crispy. Not Halal.",
                 price=8.50,
                 cuisine="Local",
                 spiciness=2,
@@ -461,113 +521,234 @@ def seed_database():
             ),
             Dish(
                 name="Curry Puff",
-                description=(
-                    "A baked or fried pastry filled with curried potatoes, chicken, "
-                    "and egg."
-                ),
+                description="A baked or fried pastry with curried potatoes, chicken, and egg. Halal versions are common.",
                 price=2.00,
                 cuisine="Local",
                 spiciness=5,
                 meal_time=["Any"],
                 meal_type="snack",
                 attributes=["Pastry", "Spicy"],
-                is_halal=True,
+                is_halal=True,  # Defaulting to common Halal version
                 is_vegetarian=False,
             ),
             Dish(
                 name="Chwee Kueh",
-                description=(
-                    "Steamed rice cakes topped with preserved radish (chai poh)."
-                ),
+                description="Steamed rice cakes with preserved radish (chai poh). Often cooked with lard, so not Halal.",
                 price=2.50,
                 cuisine="Chinese",
                 spiciness=2,
                 meal_time=["Breakfast"],
                 meal_type="snack",
-                attributes=["Budget"],
+                attributes=[
+                    "Budget",
+                    "Vegetarian",
+                ],  # vegetarian ingredients, but not preparation method
                 is_halal=False,
                 is_vegetarian=True,
+            ),
+            Dish(
+                name="Rojak",
+                description="A mixed salad of vegetables and fruits with a sweet shrimp paste dressing. Not Halal or vegetarian.",
+                price=5.00,
+                cuisine="Local",
+                spiciness=4,
+                meal_time=["Lunch", "Dinner"],
+                meal_type="side_dish",
+                attributes=["Salad", "Spicy"],
+                is_halal=False,
+                is_vegetarian=False,
+            ),
+            Dish(
+                name="Goreng Pisang (Fried Banana)",
+                description="Banana fritters, deep-fried to a golden brown. Halal from Malay stalls.",
+                price=2.50,
+                cuisine="Malay",
+                spiciness=0,
+                meal_time=["Any"],
+                meal_type="snack",
+                attributes=["Dessert", "Fried", "Snack", "Vegetarian"],
+                is_halal=True,
+                is_vegetarian=True,
+            ),
+            Dish(
+                name="Popiah",
+                description="A fresh spring roll with cooked turnip and eggs. Often contains shrimp and pork lard.",
+                price=2.50,
+                cuisine="Chinese",
+                spiciness=1,
+                meal_time=["Any"],
+                meal_type="snack",
+                attributes=["Healthy", "Snack"],
+                is_halal=False,
+                is_vegetarian=False,
             ),
             # === DESSERTS & DRINKS ===
             Dish(
                 name="Ice Kacang",
-                description=(
-                    "A mound of shaved ice topped with sweet syrups, red beans, "
-                    "sweet corn, and attap chee."
-                ),
+                description="A mound of shaved ice with sweet syrups, red beans, and jellies. Halal and vegetarian.",
                 price=3.00,
                 cuisine="Local",
                 spiciness=0,
                 meal_time=["Any"],
                 meal_type="dessert",
-                attributes=["Dessert", "Cold"],
+                attributes=["Dessert", "Cold", "Vegetarian"],
                 is_halal=True,
                 is_vegetarian=True,
             ),
             Dish(
                 name="Chendol",
-                description=(
-                    "A dessert with pandan-flavored jelly noodles, coconut milk, and "
-                    "palm sugar (gula melaka)."
-                ),
+                description="A dessert with pandan jelly noodles, coconut milk, and palm sugar. Halal and vegetarian.",
                 price=3.50,
                 cuisine="Local",
                 spiciness=0,
                 meal_time=["Any"],
                 meal_type="dessert",
-                attributes=["Dessert", "Cold", "Popular"],
+                attributes=["Dessert", "Cold", "Popular", "Vegetarian"],
                 is_halal=True,
                 is_vegetarian=True,
             ),
             Dish(
                 name="Tau Huay (Soya Beancurd)",
-                description=(
-                    "Silken soya beancurd, served warm or cold with sugar syrup."
-                ),
+                description="Silken soya beancurd, served warm or cold with sugar syrup. Halal and vegetarian.",
                 price=2.00,
                 cuisine="Chinese",
                 spiciness=0,
                 meal_time=["Any"],
                 meal_type="dessert",
-                attributes=["Dessert", "Healthy"],
+                attributes=["Dessert", "Healthy", "Vegetarian"],
                 is_halal=True,
                 is_vegetarian=True,
             ),
             Dish(
                 name="Teh Tarik",
-                description="Hot 'pulled' milk tea with a frothy top.",
+                description="Hot 'pulled' milk tea with a frothy top. Halal and vegetarian.",
                 price=1.80,
                 cuisine="Local",
                 spiciness=0,
                 meal_time=["Any"],
                 meal_type="drink",
-                attributes=["Drink", "Hot"],
+                attributes=["Drink", "Hot", "Vegetarian"],
                 is_halal=True,
                 is_vegetarian=True,
             ),
             Dish(
                 name="Kopi-O",
-                description="Traditional black coffee with sugar.",
+                description="Traditional black coffee with sugar. Halal and vegetarian.",
                 price=1.50,
                 cuisine="Local",
                 spiciness=0,
                 meal_time=["Any"],
                 meal_type="drink",
-                attributes=["Drink", "Hot", "Budget"],
+                attributes=["Drink", "Hot", "Budget", "Vegetarian"],
                 is_halal=True,
                 is_vegetarian=True,
             ),
             Dish(
                 name="Sugarcane Juice",
-                description=(
-                    "Freshly squeezed sugarcane juice, often served with a lemon."
-                ),
+                description="Freshly squeezed sugarcane juice, often served with a lemon. Halal and vegetarian.",
                 price=2.50,
                 cuisine="Local",
                 spiciness=0,
                 meal_time=["Any"],
                 meal_type="drink",
-                attributes=["Drink", "Cold", "Healthy"],
+                attributes=["Drink", "Cold", "Healthy", "Vegetarian"],
+                is_halal=True,
+                is_vegetarian=True,
+            ),
+            Dish(
+                name="Mango Pomelo Sago",
+                description="A popular Hong Kong dessert of mango, pomelo, sago and coconut milk. Halal and vegetarian.",
+                price=5.50,
+                cuisine="Chinese",
+                spiciness=0,
+                meal_time=["Any"],
+                meal_type="dessert",
+                attributes=["Dessert", "Cold", "Fruity", "Vegetarian"],
+                is_halal=True,
+                is_vegetarian=True,
+            ),
+            Dish(
+                name="Bandung",
+                description="A sweet pink drink made from rose syrup and condensed milk. Halal and vegetarian.",
+                price=2.00,
+                cuisine="Malay",
+                spiciness=0,
+                meal_time=["Any"],
+                meal_type="drink",
+                attributes=["Drink", "Cold", "Sweet", "Vegetarian"],
+                is_halal=True,
+                is_vegetarian=True,
+            ),
+            Dish(
+                name="Pulut Hitam",
+                description="A dessert of black glutinous rice porridge with coconut milk and palm sugar. Halal and vegetarian.",
+                price=3.50,
+                cuisine="Malay",
+                spiciness=0,
+                meal_time=["Any"],
+                meal_type="dessert",
+                attributes=["Dessert", "Hot", "Comfort", "Vegetarian"],
+                is_halal=True,
+                is_vegetarian=True,
+            ),
+            # === NEWLY ADDED DISHES FOR EXPANSION ===
+            Dish(
+                name="Beef Rendang",
+                description="Slow-cooked beef in coconut milk and a rich mixture of spices. A Halal Malay classic.",
+                price=9.50,
+                cuisine="Malay",
+                spiciness=7,
+                meal_time=["Lunch", "Dinner"],
+                meal_type="main_course",
+                attributes=["Spicy", "Comfort"],
+                is_halal=True,
+                is_vegetarian=False,
+            ),
+            Dish(
+                name="Yong Tau Foo",
+                description="Tofu and vegetables filled with fish paste, served in soup. Check stall for Halal status.",
+                price=7.00,
+                cuisine="Chinese",
+                spiciness=1,
+                meal_time=["Lunch", "Dinner"],
+                meal_type="main_course",
+                attributes=["Healthy", "Variety", "Soupy"],
+                is_halal=False,
+                is_vegetarian=False,
+            ),
+            Dish(
+                name="Prawn Paste Chicken (Har Cheong Gai)",
+                description="Deep-fried chicken wings marinated in a fragrant shrimp paste. A non-Halal Zi Char dish.",
+                price=10.00,
+                cuisine="Chinese",
+                spiciness=0,
+                meal_time=["Dinner"],
+                meal_type="side_dish",
+                attributes=["Fried", "Zi Char", "Popular"],
+                is_halal=False,
+                is_vegetarian=False,
+            ),
+            Dish(
+                name="Ondeh-Ondeh",
+                description="Glutinous rice balls filled with molten palm sugar, coated in coconut. Halal and vegetarian.",
+                price=3.00,
+                cuisine="Malay",
+                spiciness=0,
+                meal_time=["Any"],
+                meal_type="dessert",
+                attributes=["Dessert", "Sweet", "Snack", "Vegetarian"],
+                is_halal=True,
+                is_vegetarian=True,
+            ),
+            Dish(
+                name="Cheng Tng",
+                description="A light, sweet dessert soup with longan, barley, and white fungus. Halal and vegetarian.",
+                price=3.00,
+                cuisine="Chinese",
+                spiciness=0,
+                meal_time=["Any"],
+                meal_type="dessert",
+                attributes=["Dessert", "Hot", "Cold", "Healthy", "Vegetarian"],
                 is_halal=True,
                 is_vegetarian=True,
             ),

@@ -270,9 +270,9 @@ def test_e5_multiple_rule_integration():
         has_halal_boost = any("halal" in reason.lower() for reason in reasons)
 
         # At least one rule should have fired for this matching dish
-        assert (
-            has_cuisine_boost or has_halal_boost
-        ), f"No matching rules fired: {reasons}"
+        assert has_cuisine_boost or has_halal_boost, (
+            f"No matching rules fired: {reasons}"
+        )
 
 
 def test_e6_engine_with_no_dishes():
@@ -333,8 +333,7 @@ def test_budget_filtering_strict():
     }
 
     engine = RecommendationEngine(
-        dishes=[affordable_dish, expensive_dish],
-        user_prefs=low_budget_prefs
+        dishes=[affordable_dish, expensive_dish], user_prefs=low_budget_prefs
     )
     recommendations = engine.get_recommendations()
 
@@ -495,9 +494,7 @@ def test_scoring_halal_bonus():
         "is_vegetarian": False,
     }
 
-    engine_halal = RecommendationEngine(
-        dishes=[halal_dish], user_prefs=halal_prefs
-    )
+    engine_halal = RecommendationEngine(dishes=[halal_dish], user_prefs=halal_prefs)
     engine_non_halal = RecommendationEngine(
         dishes=[halal_dish], user_prefs=non_halal_prefs
     )

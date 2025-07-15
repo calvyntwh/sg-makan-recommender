@@ -8,10 +8,18 @@ An AI-powered food recommendation system for Singapore cuisine, combining fuzzy 
 2. Run the server: `uv run uvicorn backend.main:app --reload`
 3. Open your browser to: `http://127.0.0.1:8000/`
 
+## What You Can Do
+
+- **Get Personalized Recommendations**: Set your budget, cuisine preference, and spiciness tolerance
+- **Filter by Diet**: Find Halal or Vegetarian options 
+- **Budget-Conscious**: Get suggestions within your price range
+- **Spice Level Control**: Adjust recommendations based on heat preference
+- **Web & API Access**: Use the friendly web interface or integrate via REST API
+
 ## Features
 
 - **Hybrid AI System**: Combines fuzzy logic for preference matching with expert system rules
-- **Comprehensive Database**: 50+ authentic Singapore dishes with detailed attributes
+- **Comprehensive Database**: 58 authentic Singapore dishes with detailed attributes
 - **Dietary Preferences**: Supports halal, vegetarian, and cuisine-specific filtering
 - **Smart Scoring**: Considers budget, spiciness tolerance, and personal preferences
 - **Web Interface**: Clean, responsive frontend for easy interaction
@@ -44,6 +52,30 @@ pip install uv
    - **API Endpoints**: `http://127.0.0.1:8000/dishes` and `http://127.0.0.1:8000/recommend`
 
 3. **That's it!** FastAPI now serves both the frontend and API.
+
+## How It Works
+
+### AI System Architecture
+
+The recommendation engine uses a **hybrid approach** combining two AI techniques:
+
+1. **Fuzzy Logic System**: 
+   - Handles imprecise user preferences (budget, spiciness tolerance)
+   - Uses triangular membership functions for natural language concepts
+   - Provides base compatibility scores
+
+2. **Expert System Rules**:
+   - Applies domain-specific knowledge bonuses
+   - Cuisine matching (+1 point)
+   - Dietary preferences (Halal: +2, Vegetarian: +2)
+   - Meal type matching (+5 points)
+
+### Scoring Algorithm
+```
+Final Score = Fuzzy Logic Score + Expert System Bonuses
+```
+
+Example: A Malay dish that's Halal = Base Score + 1 (cuisine) + 2 (halal) = +3 bonus
 
 ## Troubleshooting
 
@@ -119,17 +151,21 @@ curl -X POST http://127.0.0.1:8000/recommend \
 ## Project Structure
 
 ```
-sg-makan-recc/
+sg-makan-recommender/
 ├── backend/
 │   ├── main.py          # FastAPI application
 │   ├── models.py        # Data models
 │   ├── database.py      # Database setup and seeding
-│   └── ai_system.py     # Fuzzy logic and expert system
+│   ├── ai_system.py     # Fuzzy logic and expert system
+│   └── fuzzy_config.json # Fuzzy logic configuration
 ├── frontend/
 │   └── index.html       # Web interface
 ├── tests/
+│   ├── conftest.py      # Test configuration
 │   ├── test_api.py      # API endpoint tests
 │   └── test_ai_system.py # AI system tests
+├── pyproject.toml       # Project dependencies and configuration
+├── uv.lock              # Dependency lock file
 └── singapore_food.db    # SQLite database (auto-generated)
 ```
 
