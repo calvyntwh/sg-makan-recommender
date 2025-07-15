@@ -1,115 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Singapore Makan Recommender</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-</head>
-<body class="bg-gray-100 font-sans">
-
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+  </head>
+  <body class="bg-gray-100 font-sans">
     <div class="container mx-auto p-8" x-data="recommender()">
-        <h1 class="text-4xl font-bold text-gray-800 mb-2">Singapore Makan Recommender</h1>
-        <p class="text-gray-600 mb-8">Get personalized food recommendations!</p>
+      <h1 class="text-4xl font-bold text-gray-800 mb-2">
+        Singapore Makan Recommender
+      </h1>
+      <p class="text-gray-600 mb-8">Get personalized food recommendations!</p>
 
-        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-            <h2 class="text-2xl font-semibold mb-4">Your Preferences</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="budget" class="block text-gray-700 font-medium">Budget (SGD): <span x-text="prefs.budget"></span></label>
-                    <input type="range" min="5" max="50" step="1" x-model="prefs.budget" class="w-full mt-2">
-                </div>
-                <div>
-                    <label for="cuisine" class="block text-gray-700 font-medium">Cuisine</label>
-                    <select x-model="prefs.cuisine" class="w-full p-2 border rounded mt-2">
-                        <option value="any">Any</option>
-                        <option value="Chinese">Chinese</option>
-                        <option value="Malay">Malay</option>
-                        <option value="Indian">Indian</option>
-                        <option value="Local">Local</option>
-                    </select>
-                </div>
-                 <div>
-                    <label class="block text-gray-700 font-medium">Spiciness Level: <span x-text="prefs.spiciness"></span>/10</label>
-                    <input type="range" min="0" max="10" step="1" x-model="prefs.spiciness" class="w-full mt-2">
-                </div>
-                <div class="flex items-center space-x-8">
-                    <label class="flex items-center">
-                        <input type="checkbox" x-model="prefs.is_halal" class="form-checkbox h-5 w-5">
-                        <span class="ml-2 text-gray-700">Halal</span>
-                    </label>
-                    <label class="flex items-center">
-                        <input type="checkbox" x-model="prefs.is_vegetarian" class="form-checkbox h-5 w-5">
-                        <span class="ml-2 text-gray-700">Vegetarian</span>
-                    </label>
-                </div>
-            </div>
-            <div class="mt-6">
-                <button @click="fetchRecommendations" class="w-full bg-red-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-red-700 transition" :disabled="isLoading">
-                    <span x-show="!isLoading">Find My Makan!</span>
-                    <span x-show="isLoading">Finding...</span>
-                </button>
-            </div>
+      <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Your Preferences</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="budget" class="block text-gray-700 font-medium"
+              >Budget (SGD): <span x-text="prefs.budget"></span
+            ></label>
+            <input
+              type="range"
+              min="5"
+              max="50"
+              step="1"
+              x-model="prefs.budget"
+              class="w-full mt-2"
+            />
+          </div>
+          <div>
+            <label for="cuisine" class="block text-gray-700 font-medium"
+              >Cuisine</label
+            >
+            <select
+              x-model="prefs.cuisine"
+              class="w-full p-2 border rounded mt-2"
+            >
+              <option value="any">Any</option>
+              <option value="Chinese">Chinese</option>
+              <option value="Malay">Malay</option>
+              <option value="Indian">Indian</option>
+              <option value="Local">Local</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-gray-700 font-medium"
+              >Spiciness Level: <span x-text="prefs.spiciness"></span>/10</label
+            >
+            <input
+              type="range"
+              min="0"
+              max="10"
+              step="1"
+              x-model="prefs.spiciness"
+              class="w-full mt-2"
+            />
+          </div>
+          <div class="flex items-center space-x-8">
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                x-model="prefs.is_halal"
+                class="form-checkbox h-5 w-5"
+              />
+              <span class="ml-2 text-gray-700">Halal</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                x-model="prefs.is_vegetarian"
+                class="form-checkbox h-5 w-5"
+              />
+              <span class="ml-2 text-gray-700">Vegetarian</span>
+            </label>
+          </div>
         </div>
+        <div class="mt-6">
+          <button
+            @click="fetchRecommendations"
+            class="w-full bg-red-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-red-700 transition"
+            :disabled="isLoading"
+          >
+            <span x-show="!isLoading">Find My Makan!</span>
+            <span x-show="isLoading">Finding...</span>
+          </button>
+        </div>
+      </div>
 
-        <div x-show="recommendations.length > 0">
-            <h2 class="text-2xl font-semibold mb-4">Top Recommendations For You</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <template x-for="rec in recommendations" :key="rec.dish.id">
-                    <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-red-500">
-                        <h3 class="text-xl font-bold" x-text="rec.dish.name"></h3>
-                        <p class="text-gray-600 italic" x-text="rec.dish.description"></p>
-                        <p class="mt-2 font-semibold">Price: SGD <span x-text="rec.dish.price.toFixed(2)"></span></p>
-                        <div class="mt-4">
-                            <h4 class="font-semibold text-sm">Why it's recommended:</h4>
-                            <ul class="list-disc list-inside text-sm text-gray-500">
-                                <template x-for="reason in rec.reasons">
-                                    <li x-text="reason"></li>
-                                </template>
-                                <li>Suitability Score: <span x-text="rec.score.toFixed(2)"></span></li>
-                            </ul>
-                        </div>
-                    </div>
-                </template>
+      <div x-show="recommendations.length > 0">
+        <h2 class="text-2xl font-semibold mb-4">Top Recommendations For You</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <template x-for="rec in recommendations" :key="rec.dish.id">
+            <div
+              class="bg-white p-6 rounded-lg shadow-md border-l-4 border-red-500"
+            >
+              <h3 class="text-xl font-bold" x-text="rec.dish.name"></h3>
+              <p class="text-gray-600 italic" x-text="rec.dish.description"></p>
+              <p class="mt-2 font-semibold">
+                Price: SGD <span x-text="rec.dish.price.toFixed(2)"></span>
+              </p>
+              <div class="mt-4">
+                <h4 class="font-semibold text-sm">Why it's recommended:</h4>
+                <ul class="list-disc list-inside text-sm text-gray-500">
+                  <template x-for="reason in rec.reasons">
+                    <li x-text="reason"></li>
+                  </template>
+                  <li>
+                    Suitability Score:
+                    <span x-text="rec.score.toFixed(2)"></span>
+                  </li>
+                </ul>
+              </div>
             </div>
+          </template>
         </div>
+      </div>
     </div>
 
     <script>
-        function recommender() {
-            return {
-                prefs: {
-                    budget: 20,
-                    cuisine: 'any',
-                    spiciness: 5,
-                    is_halal: false,
-                    is_vegetarian: false
-                },
-                recommendations: [],
-                isLoading: false,
-                fetchRecommendations() {
-                    this.isLoading = true;
-                    fetch('/recommend', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(this.prefs)
-                    })
-                    .then(res => {
-                        return res.json();
-                    })
-                    .then(data => {
-                        this.recommendations = data;
-                        this.isLoading = false;
-                    })
-                    .catch(err => {
-                        console.error('Error fetching recommendations:', err);
-                        this.isLoading = false;
-                    });
-                }
-            }
-        }
+      function recommender() {
+        return {
+          prefs: {
+            budget: 20,
+            cuisine: "any",
+            spiciness: 5,
+            is_halal: false,
+            is_vegetarian: false,
+          },
+          recommendations: [],
+          isLoading: false,
+          fetchRecommendations() {
+            this.isLoading = true;
+            fetch("/recommend", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(this.prefs),
+            })
+              .then((res) => {
+                return res.json();
+              })
+              .then((data) => {
+                this.recommendations = data;
+                this.isLoading = false;
+              })
+              .catch((err) => {
+                console.error("Error fetching recommendations:", err);
+                this.isLoading = false;
+              });
+          },
+        };
+      }
     </script>
-
-</body>
+  </body>
 </html>

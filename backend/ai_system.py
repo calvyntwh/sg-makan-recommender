@@ -138,8 +138,8 @@ def simple_fuzzy_inference(inputs):
         score = max(0, min(10, score))
 
         return {"recommendation_score": score}
-    except Exception as e:
-        print(f"Debug: Exception in fuzzy inference: {e}")
+    except Exception:
+        # Fallback to neutral score if fuzzy inference fails
         return {"recommendation_score": 0}
 
 
@@ -300,7 +300,6 @@ class RecommendationEngine(KnowledgeEngine):
 
     def get_recommendations(self):
         self.reset()
-        print("Debug: Starting recommendation engine...")
         self.run()
 
         # Return the recommendations created by the rule
@@ -311,5 +310,5 @@ class RecommendationEngine(KnowledgeEngine):
 
             return sorted_recommendations[:3]
         else:
-            print("Debug: No recommendations found")
+            # Return empty list if no recommendations found
             return []
