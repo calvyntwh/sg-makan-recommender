@@ -120,6 +120,16 @@
           </template>
         </div>
       </div>
+
+      <!-- No results message -->
+      <div x-show="recommendations.length === 0 && !isLoading && hasSearched" class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4 text-yellow-800">No Recommendations Found</h2>
+        <p class="text-yellow-700 mb-4" x-text="apiMessage"></p>
+        <div x-show="apiSuggestions" class="mt-4">
+          <h4 class="font-semibold text-yellow-800 mb-2">Suggestions:</h4>
+          <p class="text-yellow-700" x-text="apiSuggestions"></p>
+        </div>
+      </div>
     </div>
 
     <script>
@@ -134,8 +144,12 @@
           },
           recommendations: [],
           isLoading: false,
+          hasSearched: false,
+          apiMessage: "",
+          apiSuggestions: "",
           fetchRecommendations() {
             this.isLoading = true;
+            this.hasSearched = false;
             fetch("/recommend", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -145,11 +159,26 @@
                 return res.json();
               })
               .then((data) => {
-                this.recommendations = data;
+                // Handle the new structured response format
+                if (data.success) {
+                  this.recommendations = data.recommendations;
+                  this.apiMessage = data.message || "";
+                  this.apiSuggestions = data.metadata?.suggestions || "";
+                } else {
+                  console.warn("API returned unsuccessful response:", data.message);
+                  this.recommendations = [];
+                  this.apiMessage = data.message || "An error occurred";
+                  this.apiSuggestions = "";
+                }
+                this.hasSearched = true;
                 this.isLoading = false;
               })
               .catch((err) => {
                 console.error("Error fetching recommendations:", err);
+                this.recommendations = [];
+                this.apiMessage = "An error occurred while fetching recommendations";
+                this.apiSuggestions = "";
+                this.hasSearched = true;
                 this.isLoading = false;
               });
           },
